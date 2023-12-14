@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
+
 	"github.com/gin-gonic/gin"
 	"github.com/samuelorlato/task-manager-api/internal/core/ports"
 	"github.com/samuelorlato/task-manager-api/internal/handlers/dtos"
@@ -27,31 +29,84 @@ func (h *HTTPHandler) SetRoutes() {
 }
 
 func (h *HTTPHandler) getTasks(c *gin.Context) {
-	// TODO: implement
+	tasks, err := h.usecase.GetTasks()
+	if err != nil {
+		// TODO: handle
+	}
+
+	b, err := json.Marshal(tasks)
+	if err != nil {
+		// TODO: handle
+	}
+
+	c.JSON(200, string(b))
 }
 
 func (h *HTTPHandler) createTask(c *gin.Context) {
-	var taskDTO dtos.CreateTaskDTO
+	var createTaskDTO dtos.CreateTaskDTO
 
-	err := c.BindJSON(&taskDTO)
+	err := c.BindJSON(&createTaskDTO)
 	if err != nil {
 		// TODO: handle
 	}
 
-	err = h.usecase.CreateTask(taskDTO.Title, &taskDTO.Description, taskDTO.ToDate)
+	err = h.usecase.CreateTask(createTaskDTO.Title, &createTaskDTO.Description, createTaskDTO.ToDate)
 	if err != nil {
 		// TODO: handle
 	}
+
+	c.JSON(200, nil)
 }
 
 func (h *HTTPHandler) getTaskById(c *gin.Context) {
-	// TODO: implement
+	var getTaskByIdDTO dtos.GetTaskByIdDTO
+
+	err := c.BindJSON(&getTaskByIdDTO)
+	if err != nil {
+		// TODO: handle
+	}
+
+	task, err := h.usecase.GetTaskById(getTaskByIdDTO.Id)
+	if err != nil {
+		// TODO: handle
+	}
+
+	b, err := json.Marshal(task)
+	if err != nil {
+		// TODO: handle
+	}
+
+	c.JSON(200, string(b))
 }
 
 func (h *HTTPHandler) updateTask(c *gin.Context) {
-	// TODO: implement
+	var updateTaskDTO dtos.UpdateTaskDTO
+
+	err := c.BindJSON(&updateTaskDTO)
+	if err != nil {
+		// TODO: handle
+	}
+
+	err = h.usecase.UpdateTask(updateTaskDTO.Id, &updateTaskDTO.Title, &updateTaskDTO.Description, &updateTaskDTO.ToDate, &updateTaskDTO.Completed)
+	if err != nil {
+		// TODO: handle
+	}
+
+	c.JSON(200, nil)
 }
 
 func (h *HTTPHandler) deleteTask(c *gin.Context) {
-	// TODO: implement
+	var deleteTaskDTO dtos.DeleteTaskDTO
+
+	err := c.BindJSON(&deleteTaskDTO)
+	if err != nil {
+		// TODO: handle
+	}
+
+	err = h.usecase.DeleteTask(deleteTaskDTO.Id)
+	if err != nil {
+		// TODO: handle
+	}
+
+	c.JSON(200, nil)
 }
