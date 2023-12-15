@@ -1,11 +1,14 @@
 package ports
 
-import "github.com/samuelorlato/task-manager-api/internal/core/models"
+import (
+	"github.com/samuelorlato/task-manager-api/internal/core/models"
+	"github.com/samuelorlato/task-manager-api/pkg/errors"
+)
 
 type TaskUsecase interface {
-	GetTasks() ([]*models.Task, error)
-	CreateTask(title string, description *string, toDate string) error
-	GetTaskById(taskId string) (*models.Task, error)
-	UpdateTask(taskId string, title *string, description *string, toDate *string, completed *bool) error
-	DeleteTask(taskId string) error
+	GetTasks() ([]*models.Task, *errors.HTTPError)
+	CreateTask(title string, description *string, toDate string) *errors.HTTPError
+	GetTaskById(taskId string) (*models.Task, *errors.HTTPError)
+	UpdateTask(taskId string, title *string, description *string, toDate *string, completed *bool) *errors.HTTPError
+	DeleteTask(taskId string) *errors.HTTPError
 }

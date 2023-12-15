@@ -13,7 +13,9 @@ func main() {
 	taskRepository := repositories.NewTaskRepository()
 	taskService := services.NewTaskService(taskRepository)
 
-	HTTPHandler := handlers.NewHTTPHandler(engine, taskService)
+	errorHandler := handlers.NewErrorHandler()
+
+	HTTPHandler := handlers.NewHTTPHandler(engine, taskService, errorHandler)
 	HTTPHandler.SetRoutes()
 
 	engine.Run()
