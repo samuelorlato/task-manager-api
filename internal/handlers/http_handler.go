@@ -58,7 +58,7 @@ func (h *HTTPHandler) createTask(c *gin.Context) {
 		return
 	}
 
-	err := h.usecase.CreateTask(createTaskDTO.Title, &createTaskDTO.Description, createTaskDTO.ToDate)
+	err := h.usecase.CreateTask(createTaskDTO.Title, &createTaskDTO.Description, createTaskDTO.ToDate, &createTaskDTO.Tags)
 	if err != nil {
 		h.errorHandler.Handle(err, c)
 		return
@@ -98,7 +98,7 @@ func (h *HTTPHandler) updateTask(c *gin.Context) {
 
 	id := c.Param("id")
 
-	err := h.usecase.UpdateTask(id, &updateTaskDTO.Title, &updateTaskDTO.Description, &updateTaskDTO.ToDate, &updateTaskDTO.Completed)
+	err := h.usecase.UpdateTask(id, &updateTaskDTO.Title, &updateTaskDTO.Description, &updateTaskDTO.ToDate, &updateTaskDTO.Completed, &updateTaskDTO.Tags)
 	if err != nil {
 		h.errorHandler.Handle(err, c)
 		return

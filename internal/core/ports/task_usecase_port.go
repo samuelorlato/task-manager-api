@@ -7,8 +7,8 @@ import (
 
 type TaskUsecase interface {
 	GetTasks() ([]*models.Task, *errors.HTTPError)
-	CreateTask(title string, description *string, toDate string) *errors.HTTPError
+	CreateTask(title string, description *string, toDate string, tasks *[]string) *errors.HTTPError
 	GetTaskById(taskId string) (*models.Task, *errors.HTTPError)
-	UpdateTask(taskId string, title *string, description *string, toDate *string, completed *bool) *errors.HTTPError
+	UpdateTask(taskId string, title *string, description *string, toDate *string, completed *bool, tasks *[]string) *errors.HTTPError
 	DeleteTask(taskId string) *errors.HTTPError
 }

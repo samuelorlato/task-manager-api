@@ -31,14 +31,20 @@ func (t *TaskService) GetTasks() ([]*models.Task, *errors.HTTPError) {
 	return tasks, nil
 }
 
-func (t *TaskService) CreateTask(title string, description *string, toDate string) *errors.HTTPError {
+func (t *TaskService) CreateTask(title string, description *string, toDate string, tags *[]string) *errors.HTTPError {
 	parsedToDate, err := time.Parse(configs.ToDateTaskLayout, toDate)
 	if err != nil {
 		err := errors.NewValidationError(err)
 		return err
 	}
 
-	task := models.NewTask(title, description, parsedToDate, false)
+	if tags != nil {
+		if len(*tags) == 0 {
+			tags = nil
+		}
+	}
+
+	task := models.NewTask(title, description, parsedToDate, false, tags)
 
 	err = validation.ValidateStruct(*task)
 	if err != nil {
@@ -71,7 +77,7 @@ func (t *TaskService) GetTaskById(taskId string) (*models.Task, *errors.HTTPErro
 	return task, nil
 }
 
-func (t *TaskService) UpdateTask(taskId string, title *string, description *string, toDate *string, completed *bool) *errors.HTTPError {
+func (t *TaskService) UpdateTask(taskId string, title *string, description *string, toDate *string, completed *bool, tags *[]string) *errors.HTTPError {
 	var parsedToDate time.Time
 
 	if toDate != nil && *toDate != "" {
@@ -90,7 +96,13 @@ func (t *TaskService) UpdateTask(taskId string, title *string, description *stri
 		return err
 	}
 
-	err = t.repository.UpdateTask(taskIdUUID, title, description, &parsedToDate, completed)
+	if tags != nil {
+		if len(*tags) == 0 {
+			tags = nil
+		}
+	}
+
+	err = t.repository.UpdateTask(taskIdUUID, title, description, &parsedToDate, completed, tags)
 	if err != nil {
 		err := errors.NewRepositoryError(err)
 		return err

@@ -29,7 +29,7 @@ func (t *TaskRepository) GetTaskById(taskId uuid.UUID) (*models.Task, error) {
 	return nil, nil
 }
 
-func (t *TaskRepository) UpdateTask(taskId uuid.UUID, title *string, description *string, toDate *time.Time, completed *bool) error {
+func (t *TaskRepository) UpdateTask(taskId uuid.UUID, title *string, description *string, toDate *time.Time, completed *bool, tags *[]string) error {
 	// TODO: implement
 	return nil
 }
