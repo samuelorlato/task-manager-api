@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
-
 	"github.com/gin-gonic/gin"
 	"github.com/samuelorlato/task-manager-api/internal/core/ports"
 	"github.com/samuelorlato/task-manager-api/internal/handlers/dtos"
@@ -38,14 +36,7 @@ func (h *HTTPHandler) getTasks(c *gin.Context) {
 		return
 	}
 
-	b, marshalErr := json.Marshal(tasks)
-	if err != nil {
-		err := errors.NewGenericError(marshalErr)
-		h.errorHandler.Handle(err, c)
-		return
-	}
-
-	c.JSON(200, string(b))
+	c.JSON(200, tasks)
 }
 
 func (h *HTTPHandler) createTask(c *gin.Context) {
@@ -76,14 +67,7 @@ func (h *HTTPHandler) getTaskById(c *gin.Context) {
 		return
 	}
 
-	b, marshalErr := json.Marshal(task)
-	if err != nil {
-		err := errors.NewGenericError(marshalErr)
-		h.errorHandler.Handle(err, c)
-		return
-	}
-
-	c.JSON(200, string(b))
+	c.JSON(200, task)
 }
 
 func (h *HTTPHandler) updateTask(c *gin.Context) {
