@@ -28,9 +28,14 @@ func main() {
 	taskRepository := repositories.NewFirestoreTaskRepository(firestoreClient)
 	taskService := services.NewTaskService(taskRepository)
 
+	// TODO: create userRepository
+	userService := services.NewUserService()
+
+	bcryptService := services.NewBcryptService()
+
 	errorHandler := handlers.NewErrorHandler()
 
-	HTTPHandler := handlers.NewHTTPHandler(engine, taskService, errorHandler)
+	HTTPHandler := handlers.NewHTTPHandler(engine, taskService, userService, bcryptService, errorHandler)
 	HTTPHandler.SetRoutes()
 
 	engine.Run()
