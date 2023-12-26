@@ -25,13 +25,12 @@ func main() {
 
 	engine := gin.Default()
 
-	taskRepository := repositories.NewFirestoreTaskRepository(firestoreClient)
-	taskService := services.NewTaskService(taskRepository)
+	firestoreRepository := repositories.NewFirestoreRepository(firestoreClient)
 
-	// TODO: create userRepository
-	userService := services.NewUserService()
+	taskService := services.NewTaskService(firestoreRepository)
 
 	bcryptService := services.NewBcryptService()
+	userService := services.NewUserService(firestoreRepository, bcryptService)
 
 	errorHandler := handlers.NewErrorHandler()
 

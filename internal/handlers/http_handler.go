@@ -50,6 +50,8 @@ func (h *HTTPHandler) login(c *gin.Context) {
 		h.errorHandler.Handle(err, c)
 		return
 	}
+
+	c.JSON(200, gin.H{"status": "success"})
 }
 
 func (h *HTTPHandler) register(c *gin.Context) {
@@ -67,6 +69,8 @@ func (h *HTTPHandler) register(c *gin.Context) {
 		h.errorHandler.Handle(err, c)
 		return
 	}
+
+	c.JSON(200, gin.H{"status": "success"})
 }
 
 func (h *HTTPHandler) getTasks(c *gin.Context) {
@@ -76,7 +80,21 @@ func (h *HTTPHandler) getTasks(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, tasks)
+	var tasksDTO []dtos.TaskDTO
+	for _, task := range tasks {
+		taskDTO := dtos.TaskDTO{
+			Id:          task.Id.String(),
+			Title:       task.Title,
+			Description: task.Description,
+			ToDate:      task.ToDate.String(),
+			Completed:   *task.Completed,
+			Tags:        task.Tags,
+		}
+
+		tasksDTO = append(tasksDTO, taskDTO)
+	}
+
+	c.JSON(200, tasksDTO)
 }
 
 func (h *HTTPHandler) createTask(c *gin.Context) {
@@ -107,7 +125,16 @@ func (h *HTTPHandler) getTaskById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, task)
+	taskDTO := dtos.TaskDTO{
+		Id: task.Id.String(),
+		Title: task.Title,
+		Description: task.Description,
+		ToDate: task.ToDate.String(),
+		Completed: *task.Completed,
+		Tags: task.Tags,
+	}
+
+	c.JSON(200, taskDTO)
 }
 
 func (h *HTTPHandler) updateTask(c *gin.Context) {
