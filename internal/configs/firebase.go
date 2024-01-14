@@ -3,10 +3,8 @@ package configs
 import (
 	"context"
 	"encoding/json"
-	"os"
 
 	firebase "firebase.google.com/go"
-	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 )
 
@@ -24,16 +22,11 @@ type FirebaseCredentials struct {
 	UniverseDomain          string `json:"universe_domain"`
 }
 
-func InitFirebaseApp(ctx context.Context) (*firebase.App, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, err
-	}
-
-	credentialsJSON := []byte(os.Getenv("FIREBASE_CREDENTIALS"))
+func InitFirebaseApp(ctx context.Context, credentialsJSONString string) (*firebase.App, error) {
+	credentialsJSON := []byte(credentialsJSONString)
 
 	var credentials FirebaseCredentials
-	err = json.Unmarshal(credentialsJSON, &credentials)
+	err := json.Unmarshal(credentialsJSON, &credentials)
 	if err != nil {
 		return nil, err
 	}

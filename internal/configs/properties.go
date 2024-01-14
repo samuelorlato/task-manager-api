@@ -5,4 +5,5 @@ const (
 	FirebaseProjectId            = "task-manager-3d540"
 	FirestoreTasksCollectionName = "tasks"
 	FirestoreUsersCollectionName = "users"
+	JWTCookieName                = "token"
 )

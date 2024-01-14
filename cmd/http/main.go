@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/samuelorlato/task-manager-api/internal/configs"
 	"github.com/samuelorlato/task-manager-api/internal/core/services"
 	"github.com/samuelorlato/task-manager-api/internal/handlers"
@@ -13,7 +15,13 @@ import (
 func main() {
 	ctx := context.Background()
 
-	app, err := configs.InitFirebaseApp(ctx)
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	credentialsJSONString := os.Getenv("FIREBASE_CREDENTIALS")
+	app, err := configs.InitFirebaseApp(ctx, credentialsJSONString)
 	if err != nil {
 		panic(err)
 	}
@@ -32,9 +40,11 @@ func main() {
 	bcryptService := services.NewBcryptService()
 	userService := services.NewUserService(firestoreRepository, bcryptService)
 
+	jwtService := services.NewJWTService()
+
 	errorHandler := handlers.NewErrorHandler()
 
-	HTTPHandler := handlers.NewHTTPHandler(engine, taskService, userService, bcryptService, errorHandler)
+	HTTPHandler := handlers.NewHTTPHandler(engine, taskService, userService, bcryptService, jwtService, errorHandler)
 	HTTPHandler.SetRoutes()
 
 	engine.Run()
