@@ -8,25 +8,25 @@ import (
 )
 
 type UserService struct {
-	repository ports.UserRepository
+	repository        ports.UserRepository
 	encryptionService ports.EncryptionService
 }
 
 func NewUserService(repository ports.UserRepository, encryptionService ports.EncryptionService) ports.UserUsecase {
 	return &UserService{
-		repository: repository,
+		repository:        repository,
 		encryptionService: encryptionService,
 	}
 }
 
-func (a *UserService) GetUser(email string, password string) (*models.User, *errors.HTTPError) {
-	user, err := a.repository.GetUser(email)
+func (u *UserService) GetUser(email string, password string) (*models.User, *errors.HTTPError) {
+	user, err := u.repository.GetUser(email)
 	if err != nil {
 		err := errors.NewRepositoryError(err)
 		return nil, err
 	}
 
-	err = a.encryptionService.CompareHashAndPassword(user.Password, password)
+	err = u.encryptionService.CompareHashAndPassword(user.Password, password)
 	if err != nil {
 		err := errors.NewValidationError(err)
 		return nil, err
@@ -35,7 +35,7 @@ func (a *UserService) GetUser(email string, password string) (*models.User, *err
 	return user, nil
 }
 
-func (a *UserService) CreateUser(email string, password string) *errors.HTTPError {
+func (u *UserService) CreateUser(email string, password string) *errors.HTTPError {
 	user := models.NewUser(email, password)
 
 	err := validation.ValidateStruct(*user)
@@ -44,7 +44,7 @@ func (a *UserService) CreateUser(email string, password string) *errors.HTTPErro
 		return err
 	}
 
-	hashedPassword, err := a.encryptionService.HashPassword(user.Password)
+	hashedPassword, err := u.encryptionService.HashPassword(user.Password)
 	if err != nil {
 		err := errors.NewGenericError(err)
 		return err
@@ -52,7 +52,7 @@ func (a *UserService) CreateUser(email string, password string) *errors.HTTPErro
 
 	user.Password = *hashedPassword
 
-	err = a.repository.CreateUser(user)
+	err = u.repository.CreateUser(user)
 	if err != nil {
 		err := errors.NewRepositoryError(err)
 		return err
@@ -61,10 +61,32 @@ func (a *UserService) CreateUser(email string, password string) *errors.HTTPErro
 	return nil
 }
 
-func (a *UserService) UpdateUser(email *string, password *string) *errors.HTTPError {
+func (u *UserService) UpdateUser(loggedAsEmail string, email *string, password *string) *errors.HTTPError {
+	if password != nil {
+		hashedPassword, err := u.encryptionService.HashPassword(*password)
+		if err != nil {
+			err := errors.NewGenericError(err)
+			return err
+		}
+
+		password = hashedPassword
+	}
+
+	err := u.repository.UpdateUser(loggedAsEmail, email, password)
+	if err != nil {
+		err := errors.NewRepositoryError(err)
+		return err
+	}
+
 	return nil
 }
 
-func (a *UserService) DeleteUser(email string) *errors.HTTPError {
+func (u *UserService) DeleteUser(email string) *errors.HTTPError {
+	err := u.repository.DeleteUser(email)
+	if err != nil {
+		err := errors.NewRepositoryError(err)
+		return err
+	}
+
 	return nil
 }

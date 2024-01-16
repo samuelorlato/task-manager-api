@@ -80,7 +80,7 @@ func (t *TaskService) GetTaskById(email string, taskId string) (*models.Task, *e
 }
 
 func (t *TaskService) UpdateTask(email string, taskId string, title *string, description *string, toDate *string, completed *bool, tags *[]string) *errors.HTTPError {
-	var parsedToDate time.Time
+	var parsedToDate *time.Time
 
 	if toDate != nil && *toDate != "" {
 		parsed, err := time.Parse(configs.ToDateTaskLayout, *toDate)
@@ -89,7 +89,7 @@ func (t *TaskService) UpdateTask(email string, taskId string, title *string, des
 			return err
 		}
 
-		parsedToDate = parsed
+		parsedToDate = &parsed
 	}
 
 	taskIdUUID, err := uuid.Parse(taskId)
@@ -104,7 +104,7 @@ func (t *TaskService) UpdateTask(email string, taskId string, title *string, des
 		}
 	}
 
-	err = t.repository.UpdateTask(email, taskIdUUID, title, description, &parsedToDate, completed, tags)
+	err = t.repository.UpdateTask(email, taskIdUUID, title, description, parsedToDate, completed, tags)
 	if err != nil {
 		err := errors.NewRepositoryError(err)
 		return err

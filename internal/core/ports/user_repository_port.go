@@ -7,6 +7,6 @@ import (
 type UserRepository interface {
 	GetUser(email string) (*models.User, error)
 	CreateUser(user *models.User) error
-	UpdateUser(email *string, password *string) error
+	UpdateUser(loggedAsEmail string, email *string, password *string) error
 	DeleteUser(email string) error
 }

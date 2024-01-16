@@ -86,17 +86,70 @@ func (f *FirestoreRepository) GetTaskById(email string, taskId uuid.UUID) (*mode
 }
 
 func (f *FirestoreRepository) UpdateTask(email string, taskId uuid.UUID, title *string, description *string, toDate *time.Time, completed *bool, tags *[]string) error {
-	// TODO: implement
-	return nil
-}
+	tasks, err := f.GetTasks(email)
+	if err != nil {
+		return err
+	}
 
-func (f *FirestoreRepository) DeleteTask(email string, taskId uuid.UUID) error {
-	_, err := f.firestoreClient.Collection(configs.FirestoreTasksCollectionName).Doc(taskId.String()).Delete(context.Background())
+	var foundTask *models.Task
+	for _, task := range tasks {
+		if task.Id == taskId {
+			foundTask = task
+			break
+		}
+	}
+
+	updates := map[string]interface{}{}
+	if title != nil {
+		updates["title"] = title
+	}
+	if description != nil {
+		updates["description"] = description
+	}
+	if toDate != nil {
+		updates["toDate"] = toDate
+	}
+	if completed != nil {
+		updates["completed"] = completed
+	}
+	if tags != nil {
+		updates["tags"] = tags
+	}
+
+	firestoreUpdates := []firestore.Update{}
+	for key, value := range updates {
+		firestoreUpdates = append(firestoreUpdates, firestore.Update{
+			Path:  key,
+			Value: value,
+		})
+	}
+
+	_, err = f.firestoreClient.Collection(configs.FirestoreTasksCollectionName).Doc(foundTask.Id.String()).Update(context.Background(), firestoreUpdates)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (f *FirestoreRepository) DeleteTask(email string, taskId uuid.UUID) error {
+	tasks, err := f.GetTasks(email)
+	if err != nil {
+		return err
+	}
+
+	for _, task := range tasks {
+		if task.Id == taskId {
+			_, err := f.firestoreClient.Collection(configs.FirestoreTasksCollectionName).Doc(taskId.String()).Delete(context.Background())
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+
+	return errors.New("Task not found")
 }
 
 func (f *FirestoreRepository) GetUser(email string) (*models.User, error) {
@@ -115,7 +168,12 @@ func (f *FirestoreRepository) GetUser(email string) (*models.User, error) {
 }
 
 func (f *FirestoreRepository) CreateUser(user *models.User) error {
-	_, err := f.firestoreClient.Collection(configs.FirestoreUsersCollectionName).Doc(user.Id.String()).Set(context.Background(), map[string]interface{}{
+	_, err := f.firestoreClient.Collection(configs.FirestoreUsersCollectionName).Where("email", "==", user.Email).Documents(context.Background()).Next()
+	if err == nil {
+		return errors.New("Email used on another account")
+	}
+
+	_, err = f.firestoreClient.Collection(configs.FirestoreUsersCollectionName).Doc(user.Id.String()).Set(context.Background(), map[string]interface{}{
 		"email":    user.Email,
 		"password": user.Password,
 	})
@@ -127,12 +185,50 @@ func (f *FirestoreRepository) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (f *FirestoreRepository) UpdateUser(email *string, password *string) error {
-	// TODO: implement
+func (f *FirestoreRepository) UpdateUser(loggedAsEmail string, email *string, password *string) error {
+	users, err := f.firestoreClient.Collection(configs.FirestoreUsersCollectionName).Where("email", "==", loggedAsEmail).Documents(context.Background()).GetAll()
+	if err != nil {
+		return err
+	}
+
+	userId := users[0].Ref.ID
+
+	updates := map[string]interface{}{}
+	if email != nil {
+		updates["email"] = email
+	}
+	if password != nil {
+		updates["password"] = password
+	}
+
+	firestoreUpdates := []firestore.Update{}
+	for key, value := range updates {
+		firestoreUpdates = append(firestoreUpdates, firestore.Update{
+			Path:  key,
+			Value: value,
+		})
+	}
+
+	_, err = f.firestoreClient.Collection(configs.FirestoreUsersCollectionName).Doc(userId).Update(context.Background(), firestoreUpdates)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (f *FirestoreRepository) DeleteUser(email string) error {
-	// TODO: implement
+	users, err := f.firestoreClient.Collection(configs.FirestoreUsersCollectionName).Where("email", "==", email).Documents(context.Background()).GetAll()
+	if err != nil {
+		return err
+	}
+
+	userId := users[0].Ref.ID
+
+	_, err = f.firestoreClient.Collection(configs.FirestoreUsersCollectionName).Doc(userId).Delete(context.Background())
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

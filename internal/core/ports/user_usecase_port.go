@@ -8,6 +8,6 @@ import (
 type UserUsecase interface {
 	GetUser(email string, password string) (*models.User, *errors.HTTPError)
 	CreateUser(email string, password string) *errors.HTTPError
-	UpdateUser(email *string, password *string) *errors.HTTPError
+	UpdateUser(loggedAsEmail string, email *string, password *string) *errors.HTTPError
 	DeleteUser(email string) *errors.HTTPError
 }

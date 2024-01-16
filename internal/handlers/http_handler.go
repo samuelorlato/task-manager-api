@@ -38,6 +38,8 @@ func (h *HTTPHandler) SetRoutes() {
 	h.engine.GET("/tasks/:id", h.authenticateMiddleware, h.getTaskById)
 	h.engine.PATCH("/tasks/:id", h.authenticateMiddleware, h.updateTask)
 	h.engine.DELETE("/tasks/:id", h.authenticateMiddleware, h.deleteTask)
+	h.engine.DELETE("/user", h.authenticateMiddleware, h.deleteUser)
+	h.engine.PATCH("/user", h.authenticateMiddleware, h.updateUser)
 	h.engine.POST("/login", h.login)
 	h.engine.POST("/register", h.register)
 }
@@ -58,7 +60,7 @@ func (h *HTTPHandler) login(c *gin.Context) {
 		return
 	}
 
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(24 * time.Hour)
 	secret := os.Getenv("JWT_SECRET")
 	token, authErr := h.authService.GenerateToken(userModel.Email, &expirationTime, secret)
 	if authErr != nil {
@@ -228,7 +230,7 @@ func (h *HTTPHandler) updateTask(c *gin.Context) {
 
 	id := c.Param("id")
 
-	err := h.taskUsecase.UpdateTask(email, id, &updateTaskDTO.Title, &updateTaskDTO.Description, &updateTaskDTO.ToDate, &updateTaskDTO.Completed, &updateTaskDTO.Tags)
+	err := h.taskUsecase.UpdateTask(email, id, updateTaskDTO.Title, updateTaskDTO.Description, updateTaskDTO.ToDate, updateTaskDTO.Completed, updateTaskDTO.Tags)
 	if err != nil {
 		h.errorHandler.Handle(err, c)
 		return
@@ -248,6 +250,49 @@ func (h *HTTPHandler) deleteTask(c *gin.Context) {
 	id := c.Param("id")
 
 	err := h.taskUsecase.DeleteTask(email, id)
+	if err != nil {
+		h.errorHandler.Handle(err, c)
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success"})
+}
+
+func (h *HTTPHandler) updateUser(c *gin.Context) {
+	email, authenticationError := h.getLoggedEmail(c)
+	if authenticationError != nil {
+		err := errors.NewAuthorizationError(authenticationError)
+		h.errorHandler.Handle(err, c)
+		return
+	}
+
+	var updateUserDTO dtos.UpdateUserDTO
+
+	bindErr := c.BindJSON(&updateUserDTO)
+	if bindErr != nil {
+		err := errors.NewValidationError(bindErr)
+		h.errorHandler.Handle(err, c)
+		return
+	}
+
+	err := h.userUsecase.UpdateUser(email, updateUserDTO.Email, updateUserDTO.Password)
+	if err != nil {
+		h.errorHandler.Handle(err, c)
+		return
+	}
+
+	c.JSON(200, gin.H{"status": "success"})
+}
+
+func (h *HTTPHandler) deleteUser(c *gin.Context) {
+	email, authenticationError := h.getLoggedEmail(c)
+	if authenticationError != nil {
+		err := errors.NewAuthorizationError(authenticationError)
+		h.errorHandler.Handle(err, c)
+		return
+	}
+
+	err := h.userUsecase.DeleteUser(email)
 	if err != nil {
 		h.errorHandler.Handle(err, c)
 		return
