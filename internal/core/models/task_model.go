@@ -13,9 +13,10 @@ type Task struct {
 	ToDate      time.Time `validate:"required"`
 	Completed   *bool     `validate:"required"`
 	Tags        *[]string
+	From        string `validate:"required,email"`
 }
 
-func NewTask(title string, description *string, toDate time.Time, completed bool, tags *[]string) *Task {
+func NewTask(title string, description *string, toDate time.Time, completed bool, tags *[]string, from string) *Task {
 	return &Task{
 		Id:          uuid.New(),
 		Title:       title,
@@ -23,5 +24,6 @@ func NewTask(title string, description *string, toDate time.Time, completed bool
 		ToDate:      toDate,
 		Completed:   &completed,
 		Tags:        tags,
+		From:        from,
 	}
 }

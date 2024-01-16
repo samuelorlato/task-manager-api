@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -33,7 +32,6 @@ func NewHTTPHandler(engine *gin.Engine, taskUsecase ports.TaskUsecase, userUseca
 	}
 }
 
-// TODO: separate tasks by user based on email
 func (h *HTTPHandler) SetRoutes() {
 	h.engine.GET("/tasks", h.authenticateMiddleware, h.getTasks)
 	h.engine.POST("/tasks", h.authenticateMiddleware, h.createTask)
@@ -88,7 +86,7 @@ func (h *HTTPHandler) register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"status": "success"})
+	c.JSON(200, gin.H{"ok": "use /login to authenticate"})
 }
 
 func (h *HTTPHandler) authenticateMiddleware(c *gin.Context) {
@@ -134,9 +132,7 @@ func (h *HTTPHandler) getTasks(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(email)
-
-	tasks, err := h.taskUsecase.GetTasks()
+	tasks, err := h.taskUsecase.GetTasks(email)
 	if err != nil {
 		h.errorHandler.Handle(err, c)
 		return
@@ -167,8 +163,6 @@ func (h *HTTPHandler) createTask(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(email)
-
 	var createTaskDTO dtos.CreateTaskDTO
 
 	bindErr := c.BindJSON(&createTaskDTO)
@@ -178,13 +172,13 @@ func (h *HTTPHandler) createTask(c *gin.Context) {
 		return
 	}
 
-	err := h.taskUsecase.CreateTask(createTaskDTO.Title, &createTaskDTO.Description, createTaskDTO.ToDate, &createTaskDTO.Tags)
+	id, err := h.taskUsecase.CreateTask(email, createTaskDTO.Title, &createTaskDTO.Description, createTaskDTO.ToDate, &createTaskDTO.Tags)
 	if err != nil {
 		h.errorHandler.Handle(err, c)
 		return
 	}
 
-	c.JSON(200, gin.H{"status": "success"})
+	c.JSON(200, gin.H{"createdTaskId": id})
 }
 
 func (h *HTTPHandler) getTaskById(c *gin.Context) {
@@ -195,11 +189,9 @@ func (h *HTTPHandler) getTaskById(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(email)
-
 	id := c.Param("id")
 
-	task, err := h.taskUsecase.GetTaskById(id)
+	task, err := h.taskUsecase.GetTaskById(email, id)
 	if err != nil {
 		h.errorHandler.Handle(err, c)
 		return
@@ -225,8 +217,6 @@ func (h *HTTPHandler) updateTask(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(email)
-
 	var updateTaskDTO dtos.UpdateTaskDTO
 
 	bindErr := c.BindJSON(&updateTaskDTO)
@@ -238,7 +228,7 @@ func (h *HTTPHandler) updateTask(c *gin.Context) {
 
 	id := c.Param("id")
 
-	err := h.taskUsecase.UpdateTask(id, &updateTaskDTO.Title, &updateTaskDTO.Description, &updateTaskDTO.ToDate, &updateTaskDTO.Completed, &updateTaskDTO.Tags)
+	err := h.taskUsecase.UpdateTask(email, id, &updateTaskDTO.Title, &updateTaskDTO.Description, &updateTaskDTO.ToDate, &updateTaskDTO.Completed, &updateTaskDTO.Tags)
 	if err != nil {
 		h.errorHandler.Handle(err, c)
 		return
@@ -255,11 +245,9 @@ func (h *HTTPHandler) deleteTask(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(email)
-
 	id := c.Param("id")
 
-	err := h.taskUsecase.DeleteTask(id)
+	err := h.taskUsecase.DeleteTask(email, id)
 	if err != nil {
 		h.errorHandler.Handle(err, c)
 		return

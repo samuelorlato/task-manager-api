@@ -21,8 +21,8 @@ func NewTaskService(repository ports.TaskRepository) ports.TaskUsecase {
 	}
 }
 
-func (t *TaskService) GetTasks() ([]*models.Task, *errors.HTTPError) {
-	tasks, err := t.repository.GetTasks()
+func (t *TaskService) GetTasks(email string) ([]*models.Task, *errors.HTTPError) {
+	tasks, err := t.repository.GetTasks(email)
 	if err != nil {
 		err := errors.NewRepositoryError(err)
 		return nil, err
@@ -31,11 +31,11 @@ func (t *TaskService) GetTasks() ([]*models.Task, *errors.HTTPError) {
 	return tasks, nil
 }
 
-func (t *TaskService) CreateTask(title string, description *string, toDate string, tags *[]string) *errors.HTTPError {
+func (t *TaskService) CreateTask(email string, title string, description *string, toDate string, tags *[]string) (*string, *errors.HTTPError) {
 	parsedToDate, err := time.Parse(configs.ToDateTaskLayout, toDate)
 	if err != nil {
 		err := errors.NewValidationError(err)
-		return err
+		return nil, err
 	}
 
 	if tags != nil {
@@ -44,31 +44,33 @@ func (t *TaskService) CreateTask(title string, description *string, toDate strin
 		}
 	}
 
-	task := models.NewTask(title, description, parsedToDate, false, tags)
+	task := models.NewTask(title, description, parsedToDate, false, tags, email)
 
 	err = validation.ValidateStruct(*task)
 	if err != nil {
 		err := errors.NewValidationError(err)
-		return err
+		return nil, err
 	}
 
-	err = t.repository.CreateTask(task)
+	id, err := t.repository.CreateTask(task)
 	if err != nil {
 		err := errors.NewRepositoryError(err)
-		return err
+		return nil, err
 	}
 
-	return nil
+	idString := id.String()
+
+	return &idString, nil
 }
 
-func (t *TaskService) GetTaskById(taskId string) (*models.Task, *errors.HTTPError) {
+func (t *TaskService) GetTaskById(email string, taskId string) (*models.Task, *errors.HTTPError) {
 	taskIdUUID, err := uuid.Parse(taskId)
 	if err != nil {
 		err := errors.NewValidationError(err)
 		return nil, err
 	}
 
-	task, err := t.repository.GetTaskById(taskIdUUID)
+	task, err := t.repository.GetTaskById(email, taskIdUUID)
 	if err != nil {
 		err := errors.NewRepositoryError(err)
 		return nil, err
@@ -77,7 +79,7 @@ func (t *TaskService) GetTaskById(taskId string) (*models.Task, *errors.HTTPErro
 	return task, nil
 }
 
-func (t *TaskService) UpdateTask(taskId string, title *string, description *string, toDate *string, completed *bool, tags *[]string) *errors.HTTPError {
+func (t *TaskService) UpdateTask(email string, taskId string, title *string, description *string, toDate *string, completed *bool, tags *[]string) *errors.HTTPError {
 	var parsedToDate time.Time
 
 	if toDate != nil && *toDate != "" {
@@ -102,7 +104,7 @@ func (t *TaskService) UpdateTask(taskId string, title *string, description *stri
 		}
 	}
 
-	err = t.repository.UpdateTask(taskIdUUID, title, description, &parsedToDate, completed, tags)
+	err = t.repository.UpdateTask(email, taskIdUUID, title, description, &parsedToDate, completed, tags)
 	if err != nil {
 		err := errors.NewRepositoryError(err)
 		return err
@@ -111,14 +113,14 @@ func (t *TaskService) UpdateTask(taskId string, title *string, description *stri
 	return nil
 }
 
-func (t *TaskService) DeleteTask(taskId string) *errors.HTTPError {
+func (t *TaskService) DeleteTask(email string, taskId string) *errors.HTTPError {
 	taskIdUUID, err := uuid.Parse(taskId)
 	if err != nil {
 		err := errors.NewValidationError(err)
 		return err
 	}
 
-	err = t.repository.DeleteTask(taskIdUUID)
+	err = t.repository.DeleteTask(email, taskIdUUID)
 	if err != nil {
 		err := errors.NewRepositoryError(err)
 		return err

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -22,8 +23,8 @@ func NewFirestoreRepository(firestoreClient *firestore.Client) ports.UserAndTask
 	}
 }
 
-func (f *FirestoreRepository) GetTasks() ([]*models.Task, error) {
-	docs, err := f.firestoreClient.Collection(configs.FirestoreTasksCollectionName).Documents(context.Background()).GetAll()
+func (f *FirestoreRepository) GetTasks(email string) ([]*models.Task, error) {
+	docs, err := f.firestoreClient.Collection(configs.FirestoreTasksCollectionName).Where("from", "==", email).Documents(context.Background()).GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -52,34 +53,49 @@ func (f *FirestoreRepository) GetTasks() ([]*models.Task, error) {
 	return tasks, nil
 }
 
-func (f *FirestoreRepository) CreateTask(task *models.Task) error {
+func (f *FirestoreRepository) CreateTask(task *models.Task) (*uuid.UUID, error) {
 	_, err := f.firestoreClient.Collection(configs.FirestoreTasksCollectionName).Doc(task.Id.String()).Set(context.Background(), map[string]interface{}{
 		"title":       task.Title,
 		"description": task.Description,
 		"toDate":      task.ToDate,
 		"completed":   task.Completed,
 		"tags":        task.Tags,
+		"from":        task.From,
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
+	return &task.Id, nil
+}
+
+func (f *FirestoreRepository) GetTaskById(email string, taskId uuid.UUID) (*models.Task, error) {
+	tasks, err := f.GetTasks(email)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, task := range tasks {
+		if task.Id == taskId {
+			return task, nil
+		}
+	}
+
+	return nil, errors.New("Task not found")
+}
+
+func (f *FirestoreRepository) UpdateTask(email string, taskId uuid.UUID, title *string, description *string, toDate *time.Time, completed *bool, tags *[]string) error {
+	// TODO: implement
+	return nil
+}
+
+func (f *FirestoreRepository) DeleteTask(email string, taskId uuid.UUID) error {
+	_, err := f.firestoreClient.Collection(configs.FirestoreTasksCollectionName).Doc(taskId.String()).Delete(context.Background())
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func (f *FirestoreRepository) GetTaskById(taskId uuid.UUID) (*models.Task, error) {
-	// TODO: implement
-	return nil, nil
-}
-
-func (f *FirestoreRepository) UpdateTask(taskId uuid.UUID, title *string, description *string, toDate *time.Time, completed *bool, tags *[]string) error {
-	// TODO: implement
-	return nil
-}
-
-func (f *FirestoreRepository) DeleteTask(taskId uuid.UUID) error {
-	// TODO: implement
 	return nil
 }
 
