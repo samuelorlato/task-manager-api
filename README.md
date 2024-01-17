@@ -2,6 +2,7 @@
 A Go API made for studies that manages tasks with user authentication
 
 ## Routes
+
 #### Users
 
 <details>
@@ -9,19 +10,20 @@ A Go API made for studies that manages tasks with user authentication
 
 ##### JSON Body Params
 
-> | name      |  type     | data type               |
-> |-----------|-----------|-------------------------|
-> | email     |  required | string (valid email)    |
-> | password  |  required | string                  |
+> | name     | type     | data type            |
+> | -------- | -------- | -------------------- |
+> | email    | required | string (valid email) |
+> | password | required | string               |
 
 ##### Responses
 
-> | http code     | content-type                      | response                                                            |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `201`         | `application/json`        | `{"ok":"use /login to authenticate"}`                                |
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"Key: 'User.Email' Error:Field validation for 'Email' failed on the 'email' tag"}`                            |
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"Key: 'UserDTO.Email' Error:Field validation for 'Email' failed on the 'required' tag"}`                            |
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"Key: 'UserDTO.Password' Error:Field validation for 'Password' failed on the 'required' tag"}`                            |
+> | http code | content-type       | response                                                                                                                                  |
+> | --------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+> | `201`     | `application/json` | `{"ok":"use /login to authenticate"}`                                                                                                     |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"Key: 'User.Email' Error:Field validation for 'Email' failed on the 'email' tag"}`             |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"Key: 'UserDTO.Email' Error:Field validation for 'Email' failed on the 'required' tag"}`       |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"Key: 'UserDTO.Password' Error:Field validation for 'Password' failed on the 'required' tag"}` |
+
 </details>
 
 <details>
@@ -29,20 +31,21 @@ A Go API made for studies that manages tasks with user authentication
 
 ##### JSON Body Params
 
-> | name      |  type     | data type               |
-> |-----------|-----------|-------------------------|
-> | email     |  required | string    |
-> | password  |  required | string                  |
+> | name     | type     | data type |
+> | -------- | -------- | --------- |
+> | email    | required | string    |
+> | password | required | string    |
 
 ##### Responses
 
-> | http code     | content-type                      | response                                                            |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`         | `application/json`        | `{"token":"..."}`                                |
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"Key: 'UserDTO.Email' Error:Field validation for 'Email' failed on the 'required' tag"}`                            |
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"Key: 'UserDTO.Password' Error:Field validation for 'Password' failed on the 'required' tag"}`                           |
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"crypto/bcrypt: hashedPassword is not the hash of the given password"}`                           |
-> | `500`         | `application/json`                | `{"description":"Repository error","error":"User not found"}`                           |
+> | http code | content-type       | response                                                                                                                                  |
+> | --------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+> | `200`     | `application/json` | `{"token":"..."}`                                                                                                                         |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"Key: 'UserDTO.Email' Error:Field validation for 'Email' failed on the 'required' tag"}`       |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"Key: 'UserDTO.Password' Error:Field validation for 'Password' failed on the 'required' tag"}` |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"crypto/bcrypt: hashedPassword is not the hash of the given password"}`                        |
+> | `500`     | `application/json` | `{"description":"Repository error","error":"User not found"}`                                                                             |
+
 </details>
 
 <details>
@@ -50,26 +53,27 @@ A Go API made for studies that manages tasks with user authentication
 
 ##### JSON Body Params
 
-> | name      |  type     | data type               |
-> |-----------|-----------|-------------------------|
-> | email     |  optional | string    |
-> | password  |  optional | string                  |
+> | name     | type     | data type |
+> | -------- | -------- | --------- |
+> | email    | optional | string    |
+> | password | optional | string    |
 
 ##### Headers
 
-> | name | data type |
-> |------|-----------|
+> | name          | data type          |
+> | ------------- | ------------------ |
 > | Authorization | string (JWT token) |
 
 ##### Responses
 
-> | http code     | content-type                      | response                                                            |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`         | `application/json`        | `{"status":"success"}`                                |
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"Key: 'User.Email' Error:Field validation for 'Email' failed on the 'email' tag"}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"Authorization header not found"}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}`                            |                        |                          |
+> | http code | content-type       | response                                                                                                                      |
+> | --------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --- | --- |
+> | `200`     | `application/json` | `{"status":"success"}`                                                                                                        |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"Key: 'User.Email' Error:Field validation for 'Email' failed on the 'email' tag"}` |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                                               |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"Authorization header not found"}`                                        |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}`                            |     |     |
+
 </details>
 
 <details>
@@ -77,18 +81,19 @@ A Go API made for studies that manages tasks with user authentication
 
 ##### Headers
 
-> | name | data type |
-> |------|-----------|
+> | name          | data type          |
+> | ------------- | ------------------ |
 > | Authorization | string (JWT token) |
 
 ##### Responses
 
-> | http code     | content-type                      | response                                                            |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`         | `application/json`        | `{"status":"success"}`                                |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"Authorization header not found"}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}`                            |                        |                          |
+> | http code | content-type       | response                                                                                           |
+> | --------- | ------------------ | -------------------------------------------------------------------------------------------------- | --- | --- |
+> | `200`     | `application/json` | `{"status":"success"}`                                                                             |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                    |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"Authorization header not found"}`             |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}` |     |     |
+
 </details>
 
 #### Tasks
@@ -98,18 +103,42 @@ A Go API made for studies that manages tasks with user authentication
 
 ##### Headers
 
-> | name | data type |
-> |------|-----------|
+> | name          | data type          |
+> | ------------- | ------------------ |
 > | Authorization | string (JWT token) |
 
 ##### Responses
 
-> | http code     | content-type                      | response                                                            |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`         | `application/json`        | `[{...}]`                                |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"Authorization header not found"}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}`                            |                        |                          |
+> | http code | content-type       | response                                                                                           |
+> | --------- | ------------------ | -------------------------------------------------------------------------------------------------- | --- | --- |
+> | `200`     | `application/json` | `[{...}]`                                                                                          |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                    |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"Authorization header not found"}`             |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}` |     |     |
+
+</details>
+
+<details>
+ <summary><code>GET</code> <code><b>/tasks/:id</b></code> <code>(gets a task in authenticated user's tasks)</code></summary>
+
+##### Headers
+
+> | name          | data type          |
+> | ------------- | ------------------ |
+> | Authorization | string (JWT token) |
+
+##### Responses
+
+> | http code | content-type       | response                                                                                           |
+> | --------- | ------------------ | -------------------------------------------------------------------------------------------------- | --- | --- |
+> | `200`     | `application/json` | `{...}                                                                                             |
+> | `         |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"invalid UUID length: ..."}`                            |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                    |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"Authorization header not found"}`             |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}` |     |     |
+> | `500`     | `application/json` | `{"description":"Repository error","error":"Task not found"}`                                      |
+
 </details>
 
 <details>
@@ -117,30 +146,31 @@ A Go API made for studies that manages tasks with user authentication
 
 ##### JSON Body Params
 
-> | name      |  type     | data type               |
-> |-----------|-----------|-------------------------|
-> | title     |  required | string    |
-> | description  |  optional | string                  |
-> | toDate  |  required | string (dd/mm/yy hh:mm)                  |
-> | tags  |  optional | []string                 |
+> | name        | type     | data type               |
+> | ----------- | -------- | ----------------------- |
+> | title       | required | string                  |
+> | description | optional | string                  |
+> | toDate      | required | string (dd/mm/yy hh:mm) |
+> | tags        | optional | []string                |
 
 ##### Headers
 
-> | name | data type |
-> |------|-----------|
+> | name          | data type          |
+> | ------------- | ------------------ |
 > | Authorization | string (JWT token) |
 
 ##### Responses
 
-> | http code     | content-type                      | response                                                            |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `201`         | `application/json`        | `{"createdTaskId":"..."}`              
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"Key: 'CreateTaskDTO.Title' Error:Field validation for 'Title' failed on the 'required' tag"}`                            |                        |                          | 
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"Key: 'CreateTaskDTO.ToDate' Error:Field validation for 'ToDate' failed on the 'required' tag"}`                            |                        |                          | 
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"parsing time..."}`                            |                        |                          |   
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"Authorization header not found"}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}`                            |                        |                          |
+> | http code | content-type       | response                                                                                                                                    |
+> | --------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | --- | --- |
+> | `201`     | `application/json` | `{"createdTaskId":"..."}`                                                                                                                   |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"Key: 'CreateTaskDTO.Title' Error:Field validation for 'Title' failed on the 'required' tag"}`   |     |     |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"Key: 'CreateTaskDTO.ToDate' Error:Field validation for 'ToDate' failed on the 'required' tag"}` |     |     |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"parsing time..."}`                                                                              |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                                                             |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"Authorization header not found"}`                                                      |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}`                                          |     |     |
+
 </details>
 
 <details>
@@ -148,30 +178,32 @@ A Go API made for studies that manages tasks with user authentication
 
 ##### JSON Body Params
 
-> | name      |  type     | data type               |
-> |-----------|-----------|-------------------------|
-> | title     |  optional | string    |
-> | description  |  optional | string                  |
-> | toDate  |  optional | string (dd/mm/yy hh:mm)                  |
-> | completed | optional | bool |
-> | tags  |  optional | []string                 |
+> | name        | type     | data type               |
+> | ----------- | -------- | ----------------------- |
+> | title       | optional | string                  |
+> | description | optional | string                  |
+> | toDate      | optional | string (dd/mm/yy hh:mm) |
+> | completed   | optional | bool                    |
+> | tags        | optional | []string                |
 
 ##### Headers
 
-> | name | data type |
-> |------|-----------|
+> | name          | data type          |
+> | ------------- | ------------------ |
 > | Authorization | string (JWT token) |
 
 ##### Responses
 
-> | http code     | content-type                      | response                                                            |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`         | `application/json`        | `{"status":"success"}`              
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"parsing time..."}`                            |                        |                          |   
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"Authorization header not found"}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}`                            |                        |                          |
-> | `500`         | `application/json`                | `{"description":"Repository error","error":"Task not found"}`                           |
+> | http code | content-type       | response                                                                                           |
+> | --------- | ------------------ | -------------------------------------------------------------------------------------------------- | --- | --- |
+> | `200`     | `application/json` | `{"status":"success"}`                                                                             |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"parsing time..."}`                                     |     |     |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"invalid UUID length: ..."}`                            |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                    |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"Authorization header not found"}`             |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}` |     |     |
+> | `500`     | `application/json` | `{"description":"Repository error","error":"Task not found"}`                                      |
+
 </details>
 
 <details>
@@ -179,18 +211,20 @@ A Go API made for studies that manages tasks with user authentication
 
 ##### Headers
 
-> | name | data type |
-> |------|-----------|
+> | name          | data type          |
+> | ------------- | ------------------ |
 > | Authorization | string (JWT token) |
 
 ##### Responses
 
-> | http code     | content-type                      | response                                                            |
-> |---------------|-----------------------------------|---------------------------------------------------------------------|
-> | `200`         | `application/json`        | `{"status":"success"}`              
-> | `400`         | `application/json`                | `{"description":"Validation error","error":"parsing time..."}`                            |                        |                          |   
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"Authorization header not found"}`                            |                        |                          |
-> | `401`         | `application/json`                | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}`                            |                        |                          |
-> | `500`         | `application/json`                | `{"description":"Repository error","error":"Task not found"}`                           |
+> | http code | content-type       | response                                                                                           |
+> | --------- | ------------------ | -------------------------------------------------------------------------------------------------- | --- | --- |
+> | `200`     | `application/json` | `{"status":"success"}`                                                                             |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"parsing time..."}`                                     |     |     |
+> | `400`     | `application/json` | `{"description":"Validation error","error":"invalid UUID length: ..."}`                            |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token is malformed: ..."}`                    |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"Authorization header not found"}`             |     |     |
+> | `401`     | `application/json` | `{"description":"You must be authenticated","error":"token has invalid claims: token is expired"}` |     |     |
+> | `500`     | `application/json` | `{"description":"Repository error","error":"Task not found"}`                                      |
+
 </details>
