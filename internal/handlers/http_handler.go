@@ -10,6 +10,7 @@ import (
 	"github.com/samuelorlato/task-manager-api/internal/core/ports"
 	"github.com/samuelorlato/task-manager-api/internal/handlers/dtos"
 	"github.com/samuelorlato/task-manager-api/pkg/errors"
+	"github.com/samuelorlato/task-manager-api/pkg/validation"
 )
 
 type HTTPHandler struct {
@@ -88,7 +89,7 @@ func (h *HTTPHandler) register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"ok": "use /login to authenticate"})
+	c.JSON(201, gin.H{"ok": "use /login to authenticate"})
 }
 
 func (h *HTTPHandler) authenticateMiddleware(c *gin.Context) {
@@ -180,7 +181,7 @@ func (h *HTTPHandler) createTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"createdTaskId": id})
+	c.JSON(201, gin.H{"createdTaskId": id})
 }
 
 func (h *HTTPHandler) getTaskById(c *gin.Context) {
@@ -273,6 +274,15 @@ func (h *HTTPHandler) updateUser(c *gin.Context) {
 		err := errors.NewValidationError(bindErr)
 		h.errorHandler.Handle(err, c)
 		return
+	}
+
+	if updateUserDTO.Email != nil {
+		validationErr := validation.ValidateStruct(updateUserDTO)
+		if validationErr != nil {
+			err := errors.NewValidationError(validationErr)
+			h.errorHandler.Handle(err, c)
+			return
+		}
 	}
 
 	err := h.userUsecase.UpdateUser(email, updateUserDTO.Email, updateUserDTO.Password)

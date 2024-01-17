@@ -155,6 +155,7 @@ func (f *FirestoreRepository) DeleteTask(email string, taskId uuid.UUID) error {
 func (f *FirestoreRepository) GetUser(email string) (*models.User, error) {
 	doc, err := f.firestoreClient.Collection(configs.FirestoreUsersCollectionName).Where("email", "==", email).Documents(context.Background()).Next()
 	if err != nil {
+		err := errors.New("User not found")
 		return nil, err
 	}
 
@@ -207,6 +208,26 @@ func (f *FirestoreRepository) UpdateUser(loggedAsEmail string, email *string, pa
 			Path:  key,
 			Value: value,
 		})
+	}
+
+	if email != nil {
+		tasksToChange, err := f.GetTasks(loggedAsEmail)
+		if err != nil {
+			return err
+		}
+
+		for _, task := range tasksToChange {
+			taskUpdate := []firestore.Update{
+				{
+					Path: "from",
+					Value: email,
+				},
+			}
+			_, err = f.firestoreClient.Collection(configs.FirestoreTasksCollectionName).Doc(task.Id.String()).Update(context.Background(), taskUpdate)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	_, err = f.firestoreClient.Collection(configs.FirestoreUsersCollectionName).Doc(userId).Update(context.Background(), firestoreUpdates)
