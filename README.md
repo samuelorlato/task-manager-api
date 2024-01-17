@@ -1,4 +1,4 @@
-> | `500`         | `application/json`                | `{"description":"Repository error","error":"Task not found"}`                           |# Task Manager API
+# Task Manager API
 A Go API made for studies that manages tasks with user authentication
 
 ## Routes
